@@ -16,3 +16,6 @@ In newer JVMs: Method Area = Metaspace
 5) Why do we get Metaspace OutOfMemoryError even if Heap memory is fine?
 -> Metaspace OutOfMemoryError occurs when the JVM runs out of native memory allocated for class metadata. Since Metaspace is separate from Heap memory, it can become full even if Heap has available space. This typically happens due to excessive class loading, ClassLoader leaks, or dynamic class generation in frameworks like Spring.
 -> Unlike Heap, Metaspace uses native memory, so its limit depends on system memory unless explicitly configured.
+
+6) Where are Object References stored?
+-> Object references are stored in the Stack, but the actual Objects are stored in the Heap.
