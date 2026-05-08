@@ -31,8 +31,8 @@ String s2 = new String("Java");
 ## Why does this print true?
 ```java
 final String s1 = "Java";
-String s2 = "8";
-System.out.println(s1 == "Java8"); // true
+String s2 = s1 + "8";
+System.out.println(s2 == "Java8"); // true
 ```
 - Since `s1` is declared as `final`, the compiler can optimize the concatenation at compile time, resulting in a single pooled string `"Java8"`. Compiler treats `s1` as a constant, allowing it to perform the concatenation at compile time.
 
