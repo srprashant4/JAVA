@@ -123,12 +123,85 @@ depending on the native stack usage and JVM implementation.
 ## Runtime Constant Pool
 
 - Runtime constant pool is part of the Method Area.
-- It stores constants used by a class, such as:
-  - String literals
-  - Numeric literals
-  - Symbolic references to methods and fields
 - It is created when a class is loaded.
-- It helps the JVM resolve references during execution.
+- It works like a per-class runtime lookup table used by the JVM while executing bytecode.
+- It stores entries used by a class, such as:
+  - Numeric literals
+  - Class names
+  - Method names and method references
+  - Field names and field references
+  - Symbolic references used by bytecode instructions
+- It helps the JVM resolve symbolic references into actual runtime references.
+
+Important point about string literals:
+
+- The runtime constant pool may contain an entry for a string literal such as `"Riya"`.
+- The actual interned `String` object is stored in the String Constant Pool.
+- In modern Java, the String Constant Pool is stored on the heap.
+- So, Metaspace/runtime constant pool knows about the literal, but the actual `String` object lives in the heap-based String Constant Pool.
+
+Example:
+
+Account a = new Account("Riya", 100);
+a.deposit(50);
+
+The bytecode may refer to runtime constant pool entries for:
+
+- The class name `Account`
+- The constructor reference `Account.<init>`
+- The method reference `Account.deposit`
+- The string literal entry for `"Riya"`
+
+The JVM uses these entries to resolve what class, method, field, or literal the bytecode is talking about.
+
+## How JVM Memory Areas Work Together During Execution
+
+For a method call such as:
+
+a.deposit(50);
+
+The flow is:
+
+1. PC Register points to the current bytecode instruction, such as `invokevirtual deposit`.
+2. The current stack frame contains local variables, including reference variable `a`.
+3. Reference variable `a` points to the actual `Account` object in the heap.
+4. The heap object has a link to its class metadata in Metaspace.
+5. Metaspace tells the JVM the field layout, method information, bytecode, and runtime constant pool for `Account`.
+6. The JVM pushes a new stack frame for `deposit`.
+7. Inside that frame, `this` points to the same heap object and `amount` stores `50`.
+8. The method bytecode updates the heap object, for example changing `balance` from `100` to `150`.
+9. When the method returns, the `deposit` stack frame is popped and the PC register moves to the next instruction in the caller.
+
+Important links:
+
+- PC Register points to the current bytecode instruction for a thread.
+- Stack frames store local variables, parameters, operand stack data, and references.
+- Stack references point to heap objects.
+- Heap objects store instance data and link to class metadata.
+- Metaspace stores class metadata, method metadata, field metadata, and runtime constant pool data.
+- Runtime constant pool helps resolve symbolic references used by bytecode.
+- The actual interned string objects are stored in the heap-based String Constant Pool in modern Java.
+
+Simple chain:
+
+PC Register
+  -> current bytecode instruction
+
+Stack Frame
+  -> local variable reference
+
+Heap
+  -> actual object data
+
+Metaspace
+  -> class metadata, method info, field layout, runtime constant pool
+
+Another way to remember it:
+
+PC register decides what instruction runs next.
+Stack frame gives the JVM local variables and references.
+Heap contains the actual objects.
+Metaspace explains what those objects are and how their methods/fields work.
 
 ## Thread Shared And Thread Private Areas
 
@@ -185,6 +258,11 @@ depending on the native stack usage and JVM implementation.
 - Metaspace is the Java 8 replacement for PermGen.
 - Metaspace uses native memory, not heap memory.
 - PC register stores the current instruction address for each thread.
+- PC register points to bytecode instructions, not objects.
+- Stack references point to heap objects.
+- Heap objects link to class metadata in Metaspace.
+- Runtime constant pool stores per-class symbolic references used by bytecode.
+- String Constant Pool stores actual interned `String` objects on the heap in modern Java.
 - Native Method Stack supports execution of native methods through JNI.
 - Garbage collection mainly works on heap memory.
 - Stack memory is automatically freed when method execution completes.
