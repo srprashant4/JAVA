@@ -42,9 +42,7 @@
 
 ## Common Error
 
-```text
 java.lang.OutOfMemoryError: Metaspace
-```
 
 This usually happens when:
 
@@ -60,6 +58,19 @@ This usually happens when:
 - Classes are usually unloaded during garbage collection.
 - If a class loader is still referenced, all classes loaded by it remain in metaspace.
 - Class loader leaks are a common reason for metaspace memory issues.
+
+## When does a ClassLoader become Unavailable?
+
+- A classloader in Java is like a "worker" that loads classes (blueprints for objects) into the     JVM's memory, specifically into an area called Metaspace where class details are stored.
+
+- What Does "Unavailable" Mean?
+  - "Unavailable" simply means the classloader is no longer accessible or usable by the program. It's like the worker has been "let go" and can't do any more work. This happens when the JVM's garbage collector (a cleanup process) decides the classloader is no longer needed and removes it from memory.
+- When Does a Classloader Become Unavailable?
+  - A classloader becomes unavailable (eligible for garbage collection) when:
+    a) No references exist: Nothing in your running program (like objects, threads, or other code) is still pointing to or using that classloader. For example, if you have a web application that uses its own classloader, and you shut down or redeploy the app, the classloader might become unreachable.
+    b) During garbage collection: The JVM periodically cleans up unused memory. If the classloader has no active references, it gets collected. Once this happens, the classes it loaded can also be unloaded from Metaspace, freeing up space.
+    c) Common triggers: This often occurs in dynamic environments like application servers (e.g., Tomcat), where classloaders are created for each app. If an app is unloaded or reloaded, its classloader can become unavailable. Leaks (where references are accidentally kept) prevent this, leading to Metaspace memory issues.
+  - In short, it's the JVM's way of cleaning house—removing loaders that aren't needed so memory doesn't get clogged with unused class data. If classloaders stick around too long (due to leaks), you might see OutOfMemoryError: Metaspace errors.
 
 ## Metaspace Vs Heap
 
