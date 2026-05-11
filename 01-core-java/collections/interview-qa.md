@@ -24,6 +24,15 @@ The main interfaces in the Java Collections Framework are:
 # How does HashSet ensure uniqueness of elements?
 - HashSet uses a hash table to store its elements. When an element is added to the HashSet, it calculates the hash code of the element and determines the bucket where it should be stored. If there is already an element in that bucket, it uses the equals() method to check if the new element is equal to the existing one. If they are equal, the new element is not added, ensuring uniqueness. If they are not equal, the new element is added to the bucket, allowing for multiple elements with different hash codes.
 
+# If two objects have same hashCode, are they equal?
+- No. Two objects having the same hashCode does not necessarily mean they are equal. Different objects can generate the same hashCode, leading to hash collisions. In such cases, equals() is used to determine actual equality. Therefore, while hashCode is used for efficient storage and retrieval in hash-based collections, it does not guarantee object equality. The equals() method must be implemented correctly to ensure that objects are compared based on their content rather than just their hash code.
+
+# If two objects are equal, do they have the same hashCode?
+- Yes. If two objects are considered equal according to the equals() method, they must have the same hashCode. This is a fundamental contract in Java: if obj1.equals(obj2) is true, then obj1.hashCode() must be equal to obj2.hashCode(). However, the reverse is not necessarily true; two objects can have the same hashCode but not be equal according to the equals() method. This is because hashCode is not required to be unique, and different objects can produce the same hash code, leading to hash collisions.
+
+# Why is it important to override both equals() and hashCode() methods?
+- It is important to override both equals() and hashCode() methods to maintain the general contract for the hashCode method, which states that equal objects must have equal hash codes. If you override equals() without overriding hashCode(), you may violate this contract, leading to unexpected behavior when your objects are used in hash-based collections like HashSet or HashMap. For example, if two objects are considered equal but have different hash codes, they may be stored in different buckets in a HashSet, allowing duplicates to exist. Therefore, to ensure that your objects behave correctly in collections that rely on hashing, you should always override both methods together.
+
 # What is the difference between List, Set, and Map?
 - **List**: An ordered collection that allows duplicate elements. It maintains the insertion order and provides positional access to elements. Examples include ArrayList and LinkedList.
 - **Set**: A collection that does not allow duplicate elements. It is useful when you need to ensure uniqueness of elements. Examples include HashSet, LinkedHashSet, and TreeSet. Ordering behavior in Set depends on implementation:
