@@ -61,9 +61,18 @@ The main interfaces in the Java Collections Framework are:
 - **Comparable**: It is an interface that defines a natural ordering for objects of a class. A class that implements Comparable must override the compareTo() method to define the natural ordering. It is used when you want to sort objects based on their natural order.
 - **Comparator**: It is an interface that defines a custom ordering for objects of a class. A class that implements Comparator must override the compare() method to define the custom ordering. It is used when you want to sort objects based on a specific attribute or criteria that is different from their natural order.
 
+# When does ConcurrentModificationException occur?
+- ConcurrentModificationException occurs when a collection is modified while it is being iterated over using an iterator that does not support concurrent modifications. This typically happens when you try to add, remove, or modify elements in a collection while iterating through it using a for-each loop or an iterator. The fail-fast behavior of the iterator detects the modification and throws the exception to prevent unpredictable behavior.
+
+# What is modification count (modCount) in Java collections?
+- Modification count (modCount) is an internal variable used by Java collections to keep track of the number of times a collection has been structurally modified (e.g., adding or removing elements). It is used by fail-fast iterators to detect concurrent modifications. When an iterator is created, it captures the current modCount value. If the collection is modified while the iterator is in use, the modCount value changes, and the iterator detects this change and throws a ConcurrentModificationException to prevent unpredictable behavior.
+
 # What is the difference between fail-fast and fail-safe iterators?
 - **Fail-fast iterators**: These iterators throw a ConcurrentModificationException if the underlying collection is modified while iterating. They are not thread-safe and are designed to fail quickly to prevent unpredictable behavior. Examples include iterators of ArrayList and HashMap.
 - **Fail-safe iterators**: These iterators do not throw ConcurrentModificationException if the underlying collection is modified while iterating. They are thread-safe and work on a copy of the collection, allowing modifications without affecting the iteration. Examples include iterators of CopyOnWriteArrayList and ConcurrentHashMap.
+
+# When should we use fail-safe iterators?
+- Fail-safe iterators should be used in scenarios where you need to allow concurrent modifications to the collection while iterating over it. This is particularly useful in multi-threaded environments where multiple threads may be modifying the collection simultaneously. Fail-safe iterators provide a way to safely iterate over a collection without worrying about ConcurrentModificationException, as they work on a copy of the collection. However, they can have performance implications due to the overhead of copying the collection, so they are best used when read operations are more frequent than write operations.
 
 # What is the difference between synchronized and concurrent collections?
 - **Synchronized collections**: These collections are thread-safe by synchronizing access to the collection. They use synchronized methods or blocks to ensure that only one thread can access the collection at a time. Examples include Vector and Hashtable.
